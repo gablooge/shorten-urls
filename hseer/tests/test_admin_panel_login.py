@@ -32,16 +32,31 @@ class LoginTest(unittest.TestCase):
         self.assertTrue(response.context["user"].is_anonymous)
         self.assertEqual(response.status_code, 200)
 
-    def test_post_login_valid(self):
+    def test_post_login_valid_with_username(self):
         url = reverse("admin:login")
 
         login = self.client.login(
             username=self.User.get("username"), password=self.User.get("password")
         )
         self.assertTrue(login)
+
         response = self.client.post(url, self.User)
 
         self.assertEqual(self.User.get("username"), response.context["user"].username)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["user"].is_active)
+
+    def test_post_login_valid_with_email(self):
+        url = reverse("admin:login")
+
+        login = self.client.login(
+            username=self.User.get("email"), password=self.User.get("password")
+        )
+        self.assertTrue(login)
+
+        response = self.client.post(url, self.User)
+
+        self.assertEqual(self.User.get("email"), response.context["user"].email)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["user"].is_active)
 

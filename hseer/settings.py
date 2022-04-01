@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "hseer",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -103,6 +104,7 @@ DATABASES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = ("hseer.backends.EmailBackend",)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators

@@ -5,3 +5,4 @@ pytest-django
 flake8
 ipython
 parameterized
+black

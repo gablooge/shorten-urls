@@ -32,8 +32,14 @@ pip install -r requirements/dev.txt
 
 ```bash
 # export the variables for database if using external database
-export DB_PORT=55432
-export DB_HOST=127.0.0.1
+export DEBUG=false
+export SECRET_KEY=django-insecure-79gfkx
+export DB_USER=hseer_user
+export DB_NAME=hseer_db
+export DB_PASSWORD=11ecb9090242ac111ecb9090242ac
+export DB_HOST=localhost
+export DB_PORT=5432
+
 python manage.py runserver
 ```
 
