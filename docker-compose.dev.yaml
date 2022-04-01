@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:14.2-alpine
+    # uncomment the following for local development
+    # to allow you to access the DB at 127.0.0.1:55432
+    # ports:
+    #  - 55432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+
+  test:
+    image: test_hseer_backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    container_name: hseer_tests
+    depends_on:
+      - db
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_NAME=${DB_NAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+    command: |-
+        sh -c '
+        cd /hseer
+        pytest --cov-report term-missing --cov-config=pytest.ini --cov=./'
