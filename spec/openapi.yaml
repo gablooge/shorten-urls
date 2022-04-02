@@ -20,7 +20,97 @@ servers:
     description: Your own deployment
 
 paths:
-        
+
+  /api/v1/url/shorten/:
+    get:
+      tags:
+       - "Shortener URLs"
+      summary: Get Shorten URL List
+      description: |
+        Getting shorten URL List.
+
+        Example CURL:
+        ```
+        curl --location --request GET 'http://localhost:8000/api/v1/url/shorten/' \
+        --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQ4OTQwMTc3LCJpYXQiOjE2NDg5Mzk4NzcsImp0aSI6ImJiZDIxNmIyOWY4ZDQyZThhNmNhMzk1NTMzZTUwMWM1IiwidXNlcl9pZCI6MX0.eyFjD1tlh_RWweNSa_HIZqT2cLdDB8Iq3CsS8KjLffM' \
+        --data-raw '
+        ```
+
+      responses:
+        200:
+          description: >-
+            A shorten url created
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  "$ref": "#/components/schemas/url-object-token"
+
+        401:
+          description: >-
+            Invalid login.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Given token not valid for any token type"
+
+    post:
+      tags:
+       - "Shortener URLs"
+      summary: Create a Shorten URL
+      description: |
+        Creating a shorten URL.
+
+        Example CURL:
+        ```
+        curl --location --request POST 'http://localhost:8000/api/v1/url/shorten/' \
+        --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQ4OTQwMTc3LCJpYXQiOjE2NDg5Mzk4NzcsImp0aSI6ImJiZDIxNmIyOWY4ZDQyZThhNmNhMzk1NTMzZTUwMWM1IiwidXNlcl9pZCI6MX0.eyFjD1tlh_RWweNSa_HIZqT2cLdDB8Iq3CsS8KjLffM' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+            "url": "https://www.highsnobiety.com/p/louis-vuitton-basketball-sneakers/"
+        }'
+        ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                url:
+                  type: string
+      responses:
+        201:
+          description: >-
+            A shorten url created
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/url-object-token"
+        400:
+          description: >-
+            Invalid payload.
+          content:
+            application/json:
+              schema:
+                properties:
+                  url:
+                    type: array
+                    example: ["This field may not be null"]
+
+        401:
+          description: >-
+            Invalid login.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Given token not valid for any token type"
+
   /api/v1/account/login/:
     post:
       tags:
@@ -209,20 +299,15 @@ components:
       properties:
         id:
           type: string
-        created_by:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 1
-            email:
-              type: string
-              example: samsulhadikediri@gmail.com
         url:
           type: string
           example: https://www.highsnobiety.com/p/louis-vuitton-basketball-sneakers/
-        shorten_url:
+        shorten:
           type: string
           example: https://hseer.com/Ah54n
-        description:
+        created:
           type: string
+          example: "2022-04-02T22:51:26.307045Z"
+        modified:
+          type: string
+          example: "2022-04-02T22:51:26.307045Z"

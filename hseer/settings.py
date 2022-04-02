@@ -21,9 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get(
-    "SECRET_KEY", "django-insecure-79g&tr+w0@@13%y06_7@^x&iw)##ro+9702a%377ac!1p@)fkx"
-)
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-79gfkx")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.environ.get("DEBUG") in ["true", "True"] else False
@@ -43,6 +41,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework",
     "usom",
+    "shorten_urls",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -138,6 +137,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+APPEND_SLASH = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -194,3 +194,6 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
 }
+
+BASE_URL = "https://hseer.com"
+MAXIMUM_URL_CHARS = 7
