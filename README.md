@@ -32,7 +32,7 @@ pip install -r requirements/dev.txt
 
 ```bash
 # export the variables for database if using external database
-export DEBUG=false
+export DEBUG=true
 export SECRET_KEY=django-insecure-79gfkx
 export DB_USER=hseer_user
 export DB_NAME=hseer_db

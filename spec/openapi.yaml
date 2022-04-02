@@ -1,0 +1,167 @@
+openapi: 3.0.0
+info:
+  version: "0.1"
+  title: hseer
+  description: "hseer apps for managing the shortener URL."
+  contact:
+    name: "Samsul Hadi"
+    email: "samsulhadikediri@gmail.com"
+
+tags:
+  - name: "Shortener URLs"
+    description: >-
+      APIs for managing the shortener URLs.
+  - name: "Users"
+    description: >-
+      APIs for managing Users.
+      
+servers:
+  - url: https://{your-own-host}:{your-own-port}/{your-own-optional-prefix}
+    description: Your own deployment
+
+paths:
+        
+  /api/v1/account/login/:
+    post:
+      tags:
+       - "Users"
+      summary: Logs user into the system
+      description: |
+        Logging in a user with username and password and return user details.
+
+        Example CURL:
+        ```
+        curl --location --request POST 'http://localhost:8000/api/v1/account/login/' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+            "username": "example@gmail.com",
+            "password": "password"
+        }'
+        ```
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                  format: password
+      responses:
+        200:
+          description: >-
+            Login success
+          content:
+            application/json:
+              schema:
+                properties:
+                  refresh:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ"
+                  access:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ"
+        400:
+          description: >-
+            Invalid payload.
+          content:
+            application/json:
+              schema:
+                properties:
+                  username:
+                    type: string
+                    example: "This field may not be null"
+                  password:
+                    type: string
+                    example: "This field may not be blank"
+
+        401:
+          description: >-
+            Invalid login.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "No active account found with the given credential"
+                    
+  /api/v1/account/logout/:
+    post:
+      tags:
+       - "Users"
+      summary: Logs out current logged in user session
+      description: |
+        Logout in a user with username and password and return user details.
+
+        The successful response contains:
+
+          * tokens: refresh tokens
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                refresh_token:
+                  type: string
+                  format: password
+
+      responses:
+        400:
+          description: >-
+            Unauthorized. Refresh token is not valid
+          content:
+            application/json:
+              schema:
+                properties:
+                  success:
+                    type: boolean
+                    default: False
+                  massage:
+                    type: string
+                    example: "Refresh Token not valid"
+        200:
+          description: >-
+            Access Token Validate.
+          content:
+            application/json:
+              schema:
+                properties:
+                  success:
+                    type: boolean
+                    default: True
+                  massage:
+                    type: string
+                    example: "Logout successfully."
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    url-object-token:
+      type: object
+      properties:
+        id:
+          type: string
+        created_by:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+            email:
+              type: string
+              example: samsulhadikediri@gmail.com
+        url:
+          type: string
+          example: https://www.highsnobiety.com/p/louis-vuitton-basketball-sneakers/
+        shorten_url:
+          type: string
+          example: https://hseer.com/Ah54n
+        description:
+          type: string
