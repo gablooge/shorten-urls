@@ -93,12 +93,17 @@ paths:
        - "Users"
       summary: Logs out current logged in user session
       description: |
-        Logout in a user with username and password and return user details.
-
-        The successful response contains:
-
-          * tokens: refresh tokens
-
+        Example CURL:
+        ```
+        curl --location --request POST 'http://localhost:8000/api/v1/account/logout/' \
+        --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQ4OTI3OTczLCJpYXQiOjE2NDg5Mjc2NzMsImp0aSI6ImRiMDU0OGVlY2FiOTRjOWM5ZjIwNDc3Yjk3OGZhMWJhIiwidXNlcl9pZCI6MX0.TsYWftVxfMLf9WKoCgnsLeRqm9LcuWpjtnQyn5yXkt8' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+            "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY0ODk2NzMyNCwiaWF0IjoxNjQ4ODgwOTI0LCJqdGkiOiI0NTg2ODZlNWQ3OTU0NzdkOTM4YWY2NTQwZGUxMzEyMCIsInVzZXJfaWQiOjF9.o_a6vLI14o7Fem9ozKNl9qolOcepn5aE70anrD_RJRY"
+        }'
+        ```
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -111,7 +116,7 @@ paths:
       responses:
         400:
           description: >-
-            Unauthorized. Refresh token is not valid
+            Refresh token is not valid
           content:
             application/json:
               schema:
@@ -135,6 +140,62 @@ paths:
                   massage:
                     type: string
                     example: "Logout successfully."
+
+  /api/v1/account/token/refresh/:
+    post:
+      tags:
+       - "Users"
+      summary: Refresh the access token or get a new access token
+      description: |
+        Example CURL:
+        ```
+        curl --location --request POST 'http://localhost:8000/api/v1/account/token/refresh/' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+            "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY0ODk2NzMyNCwiaWF0IjoxNjQ4ODgwOTI0LCJqdGkiOiI0NTg2ODZlNWQ3OTU0NzdkOTM4YWY2NTQwZGUxMzEyMCIsInVzZXJfaWQiOjF9"
+        }'
+        ```
+
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                refresh_token:
+                  type: string
+                  format: password
+
+      responses:
+        400:
+          description: >-
+            Invalid payload.
+          content:
+            application/json:
+              schema:
+                properties:
+                  refresh:
+                    type: array
+                    example: ["Token is invalid or expired"]
+        401:
+          description: >-
+            Unauthorized. Refresh token is not valid
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Token is invalid or expired"
+        200:
+          description: >-
+            Get new access token.
+          content:
+            application/json:
+              schema:
+                properties:
+                  access:
+                    type: string
+                    example: "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ"
 
 components:
   securitySchemes:
