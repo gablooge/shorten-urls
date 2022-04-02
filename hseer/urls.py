@@ -1,7 +1,7 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path, include
 
 urlpatterns = [
-    # path('admin/', include("sbadmin2.urls")),
     path("admin/", admin.site.urls),
+    re_path(r"^api/v1/", include("usom.urls", namespace="usom_api")),
 ]

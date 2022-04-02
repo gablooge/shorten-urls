@@ -13,6 +13,7 @@ import os
 import secrets
 from pathlib import Path
 import logging.config
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -47,7 +48,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "hseer",
+    "rest_framework_simplejwt.token_blacklist",
+    "rest_framework",
+    "usom",
 ]
 
 MIDDLEWARE = [
@@ -120,7 +123,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTHENTICATION_BACKENDS = ("hseer.backends.EmailBackend",)
+AUTHENTICATION_BACKENDS = ("usom.backends.EmailBackend",)
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -184,3 +187,15 @@ logging.config.dictConfig(
         },
     }
 )
+
+REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}
+
+SIMPLE_JWT = {
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
+    "ROTATE_REFRESH_TOKENS": True,
+}
