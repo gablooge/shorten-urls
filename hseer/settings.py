@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "hseer",
+    "rest_framework_simplejwt.token_blacklist",
+    "rest_framework",
+    "usom",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -104,7 +106,7 @@ DATABASES = {
     }
 }
 
-AUTHENTICATION_BACKENDS = ("hseer.backends.EmailBackend",)
+AUTHENTICATION_BACKENDS = ("usom.backends.EmailBackend",)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -184,3 +186,11 @@ logging.config.dictConfig(
         },
     }
 )
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ],
+}
