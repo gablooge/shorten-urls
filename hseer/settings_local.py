@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "rest_framework_simplejwt.token_blacklist",
     "rest_framework",
     "usom",
+    "shorten_urls",
 ]
 
 MIDDLEWARE = [
@@ -138,6 +139,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+APPEND_SLASH = False
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
@@ -199,3 +202,6 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=15),
     "ROTATE_REFRESH_TOKENS": True,
 }
+
+BASE_URL = "https://hseer.com"
+MAXIMUM_URL_CHARS = 7
