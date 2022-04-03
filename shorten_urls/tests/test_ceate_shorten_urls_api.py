@@ -28,6 +28,7 @@ def test_create_shorten_url_superuser(client, django_db_setup, get_superuser_tok
     )
     assert len(data["shorten"]) == 25  # BASE_URL + MAXIMUM_URL_CHARS
     assert resp.status_code == 201
+    assert data["created_by"] == superuser.id
     assert ShortenURL.objects.count() == total + 1
     assert ShortenURL.objects.get(id=data["id"]).created_by == superuser
 
@@ -53,6 +54,7 @@ def test_create_shorten_url_staffuser(client, django_db_setup, get_staffuser_tok
     )
     assert len(data["shorten"]) == 25  # BASE_URL + MAXIMUM_URL_CHARS
     assert resp.status_code == 201
+    assert "created_by" not in data
     assert ShortenURL.objects.count() == total + 1
     assert ShortenURL.objects.get(id=data["id"]).created_by == staff_user
 

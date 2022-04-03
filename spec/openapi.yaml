@@ -21,6 +21,59 @@ servers:
 
 paths:
 
+  /api/v1/url/shorten/{id}/:
+    get:
+      tags:
+       - "Shortener URLs"
+      summary: Get a Shorten URL by ID
+      description: |
+        Getting a shorten URL by ID.
+
+        Example CURL:
+        ```
+        curl --location --request GET 'http://localhost:8000/api/v1/url/shorten/1/' \
+        --header 'Authorization: Bearer {{access}}'
+        ```
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID of the shorten URL in the database
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: >-
+            Return a shorten url
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/url-object-token"
+
+        401:
+          description: >-
+            Invalid login.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Given token not valid for any token type"
+
+        404:
+          description: >-
+            Invalid login.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Not found."
+
   /api/v1/url/shorten/:
     get:
       tags:
@@ -32,14 +85,14 @@ paths:
         Example CURL:
         ```
         curl --location --request GET 'http://localhost:8000/api/v1/url/shorten/' \
-        --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQ4OTQwMTc3LCJpYXQiOjE2NDg5Mzk4NzcsImp0aSI6ImJiZDIxNmIyOWY4ZDQyZThhNmNhMzk1NTMzZTUwMWM1IiwidXNlcl9pZCI6MX0.eyFjD1tlh_RWweNSa_HIZqT2cLdDB8Iq3CsS8KjLffM' \
-        --data-raw '
+        --header 'Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjQ4OTQwMTc3LCJpYXQiOjE2NDg5Mzk4NzcsImp0aSI6ImJiZDIxNmIyOWY4ZDQyZThhNmNhMzk1NTMzZTUwMWM1IiwidXNlcl9pZCI6MX0.eyFjD1tlh_RWweNSa_HIZqT2cLdDB8Iq3CsS8KjLffM'
         ```
-
+      security:
+        - bearerAuth: []
       responses:
         200:
           description: >-
-            A shorten url created
+            Return list of shorten URL
           content:
             application/json:
               schema:
@@ -62,6 +115,8 @@ paths:
       tags:
        - "Shortener URLs"
       summary: Create a Shorten URL
+      security:
+        - bearerAuth: []
       description: |
         Creating a shorten URL.
 
