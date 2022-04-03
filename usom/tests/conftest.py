@@ -54,3 +54,16 @@ def get_superuser_token(client, django_db_setup):
     )
 
     return resp.json()
+
+
+@pytest.fixture(scope="function")
+def get_staffuser_token(client, django_db_setup):
+    user, staff_user, superuser = django_db_setup
+    uri = reverse("usom_api:token_login")
+    resp = client.post(
+        uri,
+        data={"username": staff_user.username, "password": settings.TEST_PASSWORD},
+        content_type="application/json",
+    )
+
+    return resp.json()
