@@ -130,6 +130,54 @@ paths:
                     type: string
                     example: "Not found."
 
+    delete:
+      tags:
+       - "Shortener URLs"
+      summary: Delete a Shorten URL by ID
+      description: |
+        Deleting a shorten URL by ID.
+
+        Example CURL:
+        ```
+        curl --location --request DELETE 'http://localhost:8000/api/v1/url/shorten/5/' \
+        --header 'Authorization: Bearer {{access}}'
+        ```
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID of the shorten URL in the database
+      security:
+        - bearerAuth: []
+      responses:
+        204:
+          description: >-
+            Return empty, the data is successfully deleted
+
+        401:
+          description: >-
+            Invalid login.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Given token not valid for any token type"
+
+        404:
+          description: >-
+            Data with provided ID is not found.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Not found."
+
   /api/v1/url/shorten/:
     get:
       tags:
