@@ -65,7 +65,63 @@ paths:
 
         404:
           description: >-
+            Data with provided ID is not found.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Not found."
+
+    put:
+      tags:
+       - "Shortener URLs"
+      summary: Update a Shorten URL by ID
+      description: |
+        Updating a shorten URL by ID.
+
+        Example CURL:
+        ```
+        curl --location --request PUT 'http://localhost:8000/api/v1/url/shorten/5/' \
+        --header 'Authorization: Bearer {{access}}' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+            "url": "https://samsulhadi.com"
+        }'
+        ```
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          required: true
+          description: ID of the shorten URL in the database
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: >-
+            Return the updated shorten url
+          content:
+            application/json:
+              schema:
+                "$ref": "#/components/schemas/url-object-token"
+
+        401:
+          description: >-
             Invalid login.
+          content:
+            application/json:
+              schema:
+                properties:
+                  detail:
+                    type: string
+                    example: "Given token not valid for any token type"
+
+        404:
+          description: >-
+            Data with provided ID is not found.
           content:
             application/json:
               schema:
