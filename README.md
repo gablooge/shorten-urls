@@ -6,6 +6,15 @@
 - build and run the docker for the production
 
 ``` bash
+# export the variables or using the default from `.env`
+export DEBUG=true
+export SECRET_KEY=django-insecure-79gfkx
+export DB_USER=hseer_user
+export DB_NAME=hseer_db
+export DB_PASSWORD=11ecb9090242ac111ecb9090242ac
+export DB_HOST=db
+export DB_PORT=5432
+
 docker-compose up -d --build
 ```
 - Open the `http://localhost:9090/admin`
