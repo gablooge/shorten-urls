@@ -75,6 +75,13 @@ jobs:
           export HEADLESS=True
           poetry run python manage.py test e2e --settings=mainapps.settings.dev
       #----------------------------------------------
+      #              run openapi suite
+      #----------------------------------------------
+      - name: Run API spec validation
+        run: |
+          output=$(poetry run python manage.py spectacular --color --file spec/openapi.yaml --settings=mainapps.settings.dev 2>&1)
+          if [[ -n "$output" ]]; then echo "Something happened:\n $output"; exit 1; fi
+      #----------------------------------------------
       #              run lint suite
       #----------------------------------------------
       - name: Run markdownlint
