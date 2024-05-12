@@ -81,6 +81,7 @@ jobs:
           poetry run safety check --full-report
       - name: Check licenses
         run: |
+          poetry export --output requirements.txt --without dev
           poetry run liccheck -s pip-licenses-strategy.ini
       - name: Run bandit
         run: |
