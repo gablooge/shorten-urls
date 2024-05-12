@@ -7,7 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 class LogoutView(APIView):
     permission_classes = (IsAuthenticated,)
-    # serializer_class = None
+    serializer_class = None
 
     def post(self, request):
         message = ""
