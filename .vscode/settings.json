@@ -1,0 +1,7 @@
+{
+  "python.linting.pylintArgs": [
+    "--disable=undefined-variable",
+    "--disable=missing-module-docstring",
+    "--disable=no-member"
+  ]
+}

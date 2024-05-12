@@ -1,9 +1,0 @@
-pytest
-psycopg2-binary
-pytest-cov
-pytest-django
-flake8
-ipython
-parameterized
-black
-mixer==7.2.2

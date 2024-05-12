@@ -1,30 +1,71 @@
-version: '3.7'
+version: '3.8'
 
 services:
   db:
-    image: postgres:14.2-alpine
-    # uncomment the following for local development
-    # to allow you to access the DB at 127.0.0.1:55432
-    # ports:
-    #  - 55432:5432
+    image: postgres:16.0-alpine
+    expose:
+     - 5432
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres
       - POSTGRES_PASSWORD=postgres
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - database:/var/lib/postgresql/data
+    tmpfs:
+      - /var/run/postgresql
+    networks:
+      mainappsnetwork:
+    ports:
+      # Bind locally to prevent remote access
+      - 127.0.0.1:5432:5432
+
+  apps:
+    image: mainapps:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: mainapps_dev
+    volumes:
+      - .:/mainapps
+    depends_on:
+      - db
+    environment:
+      - DEBUG=true
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+    command: sh -c "python manage.py makemigrations && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    networks:
+      mainappsnetwork:
 
   test:
-    image: test_hseer_backend:latest
+    image: test_mainapps:latest
     build:
       context: .
       dockerfile: Dockerfile.tests
-    container_name: hseer_tests
+    container_name: mainapps_tests
     depends_on:
       - db
     environment:
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - DB_HOST=db
+      - DB_PORT=5432
     command: |-
         sh -c '
-        cd /hseer
-        pytest --cov-report term-missing --cov-config=pytest.ini --cov=./'
+        cd /mainapps
+        coverage erase
+        coverage run manage.py test --exclude=e2e --keepdb --settings=mainapps.settings.dev
+        coverage report'
+    networks:
+      mainappsnetwork:
+
+networks:
+  mainappsnetwork:
+
+volumes:
+  database: {}

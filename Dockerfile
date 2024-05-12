@@ -1,27 +1,29 @@
-FROM python:3.10.2-alpine3.15
+# this allows dockerfile to *know* about build arguments
 
-COPY . /hseer
+FROM python:3.11.6-alpine as production
 
-RUN set -ex \
-    && apk add --no-cache postgresql-libs \
-    && apk add --no-cache --virtual .build-deps build-base postgresql-dev \
-    && python -m venv /env \
-    && /env/bin/pip install --upgrade pip \
-    && /env/bin/pip install --no-cache-dir -r /hseer/requirements/base.txt \
-    && runDeps="$(scanelf --needed --nobanner --recursive /env \
-        | awk '{ gsub(/,/, "\nso:", $2); print "so:" $2 }' \
-        | sort -u \
-        | xargs -r apk info --installed \
-        | sort -u)" \
-    && apk add --virtual rundeps $runDeps \
-    && apk del .build-deps
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN apk update && \
+ apk add postgresql-libs && \
+ apk add --virtual .build-deps build-base musl-dev postgresql-dev libffi-dev python3-dev cargo
 
 RUN apk add --no-cache postgresql-client
-WORKDIR /hseer
 
-ENV VIRTUAL_ENV /env
-ENV PATH /env/bin:$PATH
+COPY . /mainapps
 
-EXPOSE 8000
+WORKDIR /mainapps
 
-RUN chmod +x wait-for-postgres.sh
+RUN pip install --upgrade pip && \
+    pip install poetry
+
+RUN poetry export --output requirements.txt
+
+RUN pip install -r requirements.txt
+
+RUN python manage.py collectstatic --noinput
+
+CMD sh ./scripts/wait-and-setup-for-postgres.sh && python manage.py migrate && gunicorn --bind :8001 --workers 3 mainapps.wsgi
+
+EXPOSE 8001
