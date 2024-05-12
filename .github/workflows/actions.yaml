@@ -80,10 +80,7 @@ jobs:
       - name: Run markdownlint
         uses: articulate/actions-markdownlint@v1
         with:
-          config: markdownlint-config.json
-          files: 'docs/**/*.md'
-          ignore: node_modules
-          version: 0.28.1
+          files: '*'
       - name: Run flake8
         run: |
           poetry run flake8 . --extend-exclude=dist,build --show-source --statistics
