@@ -1,8 +1,8 @@
 openapi: 3.0.3
 info:
-  title: Mainapps BE API
+  title: Shorten URL API
   version: 1.0.0
-  description: All APIs which are available in mainapps
+  description: All APIs which are available in shorten URL apps
 paths:
   /api/v1/account/login/:
     post:

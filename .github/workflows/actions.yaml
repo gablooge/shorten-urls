@@ -84,7 +84,6 @@ jobs:
       - name: Run API spec generation
         run: |
           poetry run python manage.py spectacular --color --file spec/openapi.yaml --settings=mainapps.settings.dev && git diff --exit-code
-
       #----------------------------------------------
       #              run lint suite
       #----------------------------------------------
