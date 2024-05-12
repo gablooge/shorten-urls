@@ -60,6 +60,13 @@ jobs:
       #----------------------------------------------
       #              run test suite
       #----------------------------------------------
+      - name: Run migration tests
+        # Ensure that all existing migrations are fine to be applied and no new migrations file
+        run: |
+          poetry run python manage.py makemigrations --settings=mainapps.settings.dev
+          poetry run python manage.py migrate --settings=mainapps.settings.dev
+          export NEW_MIGRATION_EXISTS=$(git ls-files --other --exclude-standard)
+          if [ -n "$NEW_MIGRATION_EXISTS" ]; then echo "New migration exists"; exit 1; else echo "No new migration"; exit 0; fi
       - name: Run unit tests
         run: |
           poetry run python manage.py test --exclude=e2e --settings=mainapps.settings.dev
@@ -67,12 +74,18 @@ jobs:
         run: |
           export HEADLESS=True
           poetry run python manage.py test e2e --settings=mainapps.settings.dev
+      #----------------------------------------------
+      #              run lint suite
+      #----------------------------------------------
       - name: Run flake8
         run: |
           poetry run flake8 . --extend-exclude=dist,build --show-source --statistics
       - name: Sort imports
         run: |
           poetry run isort . --check-only
+      #----------------------------------------------
+      #              run security suite
+      #----------------------------------------------
       - name: Run safety check
         continue-on-error: true
         run: |

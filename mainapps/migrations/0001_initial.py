@@ -31,12 +31,6 @@ class Migration(migrations.Migration):
                         blank=True, null=True, upload_to="logo/", verbose_name="Logo"
                     ),
                 ),
-                (
-                    "manual_book",
-                    models.URLField(
-                        blank=True, null=True, verbose_name="Link Manual Book"
-                    ),
-                ),
             ],
             options={
                 "verbose_name": "Site Configuration",
