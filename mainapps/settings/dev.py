@@ -100,8 +100,8 @@ REST_FRAMEWORK.update(
 )
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Mainapps BE API",
-    "DESCRIPTION": "All APIs which are available in mainapps",
+    "TITLE": "Shorten URL API",
+    "DESCRIPTION": "All APIs which are available in shorten URL apps",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": True,
     "SWAGGER_UI_DIST": "SIDECAR",  # shorthand to use the sidecar instead

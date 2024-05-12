@@ -81,6 +81,10 @@ jobs:
         run: |
           output=$(poetry run python manage.py spectacular --color --file spec/openapi.yaml --settings=mainapps.settings.dev 2>&1)
           if [[ -n "$output" ]]; then echo "Something happened:\n $output"; exit 1; fi
+      - name: Run API spec generation
+        run: |
+          poetry run python manage.py spectacular --color --file spec/openapi.yaml --settings=mainapps.settings.dev && git diff --exit-code
+
       #----------------------------------------------
       #              run lint suite
       #----------------------------------------------
