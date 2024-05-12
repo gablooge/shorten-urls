@@ -78,9 +78,9 @@ jobs:
       #              run lint suite
       #----------------------------------------------
       - name: Run markdownlint
-        uses: articulate/actions-markdownlint@v1
+        uses: nosborn/github-action-markdown-cli@v3.3.0
         with:
-          files: '*'
+          files: .
       - name: Run flake8
         run: |
           poetry run flake8 . --extend-exclude=dist,build --show-source --statistics
