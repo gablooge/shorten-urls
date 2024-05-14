@@ -113,3 +113,21 @@ jobs:
       - name: Run bandit
         run: |
           poetry run bandit -c .bandit.yml -r *
+      #----------------------------------------------
+      #              run build test suite
+      #----------------------------------------------
+      - name: Build and start container
+        run: |
+          docker build . -t samsulhadi/shorten-urls
+          # create an `apps_network` if haven't created
+          docker network ls | grep -q apps_network || docker network create apps_network
+          # Get the IP address of the host machine from the Docker network for DB_HOST
+          export DB_HOST=localhost
+          docker run -d --network host --rm --name shorten-urls -e DB_HOST=$DB_HOST --health-cmd "curl --fail http://localhost:8001/admin/ || exit 1" --health-interval 30s --health-retries 5 --health-timeout 10s samsulhadi/shorten-urls
+      - name: Wait for container
+        uses: stringbean/docker-healthcheck-action@v1
+        with:
+          container: shorten-urls
+          wait-time: 50
+          require-status: running
+          require-healthy: true

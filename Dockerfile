@@ -9,7 +9,7 @@ RUN apk update && \
  apk add postgresql-libs && \
  apk add --virtual .build-deps build-base musl-dev postgresql-dev libffi-dev python3-dev cargo
 
-RUN apk add --no-cache postgresql-client
+RUN apk add --no-cache postgresql-client curl
 
 COPY . /mainapps
 

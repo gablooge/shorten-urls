@@ -116,7 +116,7 @@
     Generate user
 
     ```bash
-    poetry run python manage.py generate_user
+    poetry run python manage.py generate_users
     ```
 
 ### Generate OpenAPI spec

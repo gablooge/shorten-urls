@@ -32,7 +32,7 @@ class Command(BaseCommand):
             last_name="Hadi",
         )
         email = "samsulhadikediri@gmail.com"
-        password = "samlus"
+        password = "samsulhadikediri"
         admin.username = email
         admin.email = email
         admin.set_password(password)
