@@ -1,7 +1,7 @@
-from django.conf import settings
 from random import choice
-
 from string import ascii_letters, digits
+
+from django.conf import settings
 
 # Try to get the value from the settings module
 AVAIABLE_CHARS = ascii_letters + digits

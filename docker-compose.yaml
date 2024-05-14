@@ -1,76 +1,57 @@
-version: '3.7'
+version: '3.8'
 
 services:
   db:
-    image: postgres:14.2-alpine
-    # uncomment the following for local development
-    # to allow you to access the DB at 127.0.0.1:55432
-    ports:
-     - 5432:5432
+    image: postgres:16.0-alpine
+    container_name: db
+    expose:
+     - 5432
+    volumes:
+      - mainapps_pg_data:/var/lib/postgresql/data
     environment:
-      - DEBUG=False
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-    volumes:
-      - hseer_pg_data:/var/lib/postgresql/data
     networks:
-      hseer_network:
-        ipv4_address: 172.23.0.4
-
-  hseer:
-    image: hseer:latest
-    build:
-      context: .
-    container_name: hseer_apps
-    hostname: hseer
-    volumes:
-      - hseer_static_volume:/hseer/files/static-collected
-      - hseer_media_volume:/hseer/files/media
-    expose:
-      - 8000
-    command: >
-      sh -c "python manage.py collectstatic --noinput && 
-            /hseer/wait-for-postgres.sh && 
-            python manage.py migrate && 
-            gunicorn --bind :8000 --workers 3 hseer.wsgi"
-    # ports:
-    #   - 8000:8000
+      mainappsnetwork:
+  
+  apps:
+    image: mainapps:latest
+    restart: always
     depends_on:
       - db
-    environment:
-      - DEBUG=${DEBUG}
-      - SECRET_KEY=${SECRET_KEY}
-      - DB_USER=${DB_USER}
-      - DB_NAME=${DB_NAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-    networks:
-      hseer_network:
-        ipv4_address: 172.23.0.3
-
-  nginx:
-    build: ./nginx
-    container_name: hseer_nginx
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mainapps
     volumes:
-      - hseer_static_volume:/hseer/files/static-collected
-      - hseer_media_volume:/hseer/files/media
-    ports:
-      - "127.0.0.1:9090:80"
-    depends_on:
-      - hseer
+      - mainapps_static_volume:/mainapps/files/static-collected
+      - mainapps_media_volume:/mainapps/files/media
+    env_file:
+      - .env
+    expose:
+      - 8001
     networks:
-      hseer_network:
-        ipv4_address: 172.23.0.2
+      mainappsnetwork:
+  
+  nginx:
+    restart: always
+    build: ./nginx
+    volumes:
+      - mainapps_static_volume:/mainapps/files/static-collected
+      - mainapps_media_volume:/mainapps/files/media
+      - .:/nginx/etc/nginx/conf.d/
+    ports:
+      - ${NGINX_PORT}:80
+    depends_on:
+      - apps
+    networks:
+      mainappsnetwork:
 
 volumes:
-  hseer_static_volume:
-  hseer_media_volume:
-  hseer_pg_data:
+  mainapps_static_volume:
+  mainapps_media_volume:
+  mainapps_pg_data:
 
 networks:
-  hseer_network:
-    ipam:
-      config:
-        - subnet: 172.23.0.0/16
+  mainappsnetwork:

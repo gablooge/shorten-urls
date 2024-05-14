@@ -1,0 +1,133 @@
+name: Django Shorten URLs Backend
+
+on: [push]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      #----------------------------------------------
+      #       check-out repo and set-up python
+      #----------------------------------------------
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up python
+        id: setup-python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      #----------------------------------------------
+      #  -----  install & configure poetry  -----
+      #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+      #----------------------------------------------
+      #       load cached venv if cache exists
+      #----------------------------------------------
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+      #----------------------------------------------
+      # install dependencies if cache does not exist
+      #----------------------------------------------
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+      #----------------------------------------------
+      # install your root project, if required
+      #----------------------------------------------
+      - name: Install project
+        run: poetry install --no-interaction
+      #----------------------------------------------
+      #              run test suite
+      #----------------------------------------------
+      - name: Run migration tests
+        # Ensure that all existing migrations are fine to be applied and no new migrations file
+        run: |
+          poetry run python manage.py makemigrations --settings=mainapps.settings.dev
+          poetry run python manage.py migrate --settings=mainapps.settings.dev
+          export NEW_MIGRATION_EXISTS=$(git ls-files --other --exclude-standard)
+          if [ -n "$NEW_MIGRATION_EXISTS" ]; then echo "New migration exists"; exit 1; else echo "No new migration"; exit 0; fi
+      - name: Run unit tests
+        run: |
+          poetry run python manage.py test --exclude=e2e --settings=mainapps.settings.dev
+      - name: Run e2e tests
+        run: |
+          export HEADLESS=True
+          poetry run python manage.py test e2e --settings=mainapps.settings.dev
+      #----------------------------------------------
+      #              run openapi suite
+      #----------------------------------------------
+      - name: Run API spec validation
+        run: |
+          output=$(poetry run python manage.py spectacular --color --file spec/openapi.yaml --settings=mainapps.settings.dev 2>&1)
+          if [[ -n "$output" ]]; then echo "Something happened:\n $output"; exit 1; fi
+      - name: Run API spec generation
+        run: |
+          poetry run python manage.py spectacular --color --file spec/openapi.yaml --settings=mainapps.settings.dev && git diff --exit-code
+      #----------------------------------------------
+      #              run lint suite
+      #----------------------------------------------
+      - name: Run markdownlint
+        uses: nosborn/github-action-markdown-cli@v3.3.0
+        with:
+          files: .
+      - name: Run flake8
+        run: |
+          poetry run flake8 . --extend-exclude=dist,build --show-source --statistics
+      - name: Sort imports
+        run: |
+          poetry run isort . --check-only
+      #----------------------------------------------
+      #              run security suite
+      #----------------------------------------------
+      - name: Run safety check
+        continue-on-error: true
+        run: |
+          wget https://github.com/pyupio/safety-db/raw/master/data/insecure_full.json
+          wget https://github.com/pyupio/safety-db/raw/master/data/insecure.json
+          poetry run safety check --full-report
+      - name: Check licenses
+        run: |
+          poetry export --output requirements.txt --without dev
+          poetry run liccheck -s pip-licenses-strategy.ini
+      - name: Run bandit
+        run: |
+          poetry run bandit -c .bandit.yml -r *
+      #----------------------------------------------
+      #              run build test suite
+      #----------------------------------------------
+      - name: Build and start container
+        run: |
+          docker build . -t samsulhadi/shorten-urls
+          # create an `apps_network` if haven't created
+          docker network ls | grep -q apps_network || docker network create apps_network
+          # Get the IP address of the host machine from the Docker network for DB_HOST
+          export DB_HOST=localhost
+          docker run -d --network host --rm --name shorten-urls -e DB_HOST=$DB_HOST --health-cmd "curl --fail http://localhost:8001/admin/ || exit 1" --health-interval 30s --health-retries 5 --health-timeout 10s samsulhadi/shorten-urls
+      - name: Wait for container
+        uses: stringbean/docker-healthcheck-action@v1
+        with:
+          container: shorten-urls
+          wait-time: 50
+          require-status: running
+          require-healthy: true

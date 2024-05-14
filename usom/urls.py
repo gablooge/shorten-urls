@@ -1,10 +1,8 @@
 from django.urls import path
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
-from usom.views import LogoutView
+from rest_framework_simplejwt.views import (TokenObtainPairView,
+                                            TokenRefreshView)
 
+from usom.views import LogoutView
 
 app_name = "usom_app"
 

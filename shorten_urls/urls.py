@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework import routers
 
 from shorten_urls.viewsets import ShortenURLViewSet
@@ -13,6 +13,6 @@ class OptionalSlashRouter(routers.DefaultRouter):
 
 
 router = OptionalSlashRouter()
-router.register(r"url/shorten", ShortenURLViewSet, basename="ShortenURL")
+router.register(r"url/shorten", ShortenURLViewSet, basename="shorten_url")
 
 urlpatterns = [path("", include(router.urls))]

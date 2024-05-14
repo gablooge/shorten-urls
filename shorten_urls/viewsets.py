@@ -1,7 +1,9 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+
 from shorten_urls.models import ShortenURL
-from shorten_urls.serializers import ShortenURLSerializer, ShortenURLSuperuserSerializer
+from shorten_urls.serializers import (ShortenURLSerializer,
+                                      ShortenURLSuperuserSerializer)
 
 
 class ShortenURLViewSet(viewsets.ModelViewSet):

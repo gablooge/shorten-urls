@@ -1,6 +1,6 @@
-from django.db import models
-from django.contrib.auth.models import User
 from django.conf import settings
+from django.db import models
+
 from shorten_urls.utils import create_shortened_url
 
 
@@ -8,7 +8,7 @@ class ShortenURL(models.Model):
     url = models.URLField(max_length=255)
     shorten = models.URLField(max_length=50)
     created_by = models.ForeignKey(
-        User, on_delete=models.SET_NULL, blank=True, null=True
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, blank=True, null=True
     )
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
@@ -18,7 +18,7 @@ class ShortenURL(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.shorten:
-            self.shorten = settings.BASE_URL + "/" + create_shortened_url(self)
+            self.shorten = settings.SHORTEN_BASE_URL + "/" + create_shortened_url(self)
         super().save(*args, **kwargs)
 
     def __str__(self):

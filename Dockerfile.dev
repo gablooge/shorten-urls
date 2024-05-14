@@ -1,0 +1,21 @@
+# this allows dockerfile to *know* about build arguments
+
+FROM python:3.11.6-slim-bookworm
+
+
+ENV PYTHONUNBUFFERED 1
+
+RUN apt-get update
+
+RUN apt-get install -y libpq-dev libpq5 gcc git build-essential
+
+COPY poetry.lock pyproject.toml /mainapps/
+
+WORKDIR /mainapps
+
+RUN pip install --upgrade pip && \
+    pip install poetry
+
+RUN poetry export --output requirements-dev.txt --with dev
+
+RUN pip install -r requirements-dev.txt
